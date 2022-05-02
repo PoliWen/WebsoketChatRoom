@@ -3,6 +3,7 @@ const ws = require('nodejs-websocket')
 const TYPE_ENTER = 0
 const TYPE_LEAVE = 1
 const TYPE_MSG = 2
+
 let count = 0 // 连接上来的用户总数
 const server = ws.createServer((connect) => {
   console.log('有用户连接上来了')

@@ -1,13 +1,14 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { resolve } from 'path'
+
+const path = require('path')
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src')
+      '@': path.resolve('src')
     }
   },
   server: {
@@ -15,7 +16,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/socket.io': {
-        target: 'ws://localhost:4000',
+        target: 'ws://localhost:8080',
         ws: true
       }
     }
