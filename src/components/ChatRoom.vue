@@ -37,7 +37,7 @@
           </div>
           <div class="message">
             <span class="poper-arrow"></span>
-            文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼
+            fsdjkfjsfjsflsdjfjslfjsdlfjskjflsdjfsjfljs
           </div>
         </div>
       </div>
