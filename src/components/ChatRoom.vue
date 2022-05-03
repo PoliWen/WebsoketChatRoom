@@ -3,17 +3,17 @@
     <div class="sider-bar">
       <div class="user-info">
         <div class="avator">
-          <img :src="myselfAvator" alt="" />
+          <img :src="findAvatorSrc(chatRoom.chatData.myself.avator)" alt="" />
         </div>
         <span>{{ chatRoom.chatData.myself.userName }}</span>
       </div>
       <h3>用户列表</h3>
 
-      <div class="user-info" v-for="i in 10" :key="i">
+      <div class="user-info" v-for="(item, index) in chatRoom.chatData.users" :key="index">
         <div class="avator">
-          <img :src="avator1" alt="" />
+          <img :src="findAvatorSrc(item.avator)" alt="" />
         </div>
-        <span>文孝礼</span>
+        <span>{{ item.userName }}</span>
       </div>
     </div>
     <div class="right-room">
@@ -44,7 +44,6 @@
             fsdjkfjsfjsflsdjfjslfjsdlfjskjflsdjfsjfljs
           </div>
         </div>
-        {{ chatRoom.chatData.users }}
       </div>
       <div class="send-panel">
         <textarea name="" id="" cols="30" rows="10"></textarea>
@@ -70,17 +69,6 @@ const chatRoom = chatRoomStore()
 const findAvatorSrc = (avatorName: string) => {
   return avatorConfig.find((item: any) => item.name === avatorName).src
 }
-const myselfAvator = findAvatorSrc(chatRoom.chatData.myself.avator)
-
-// const userList = computed(() => {
-//   return chatRoom.users.map((item: any) => {
-//     item.avator = findAvatorSrc(item.avator)
-//     return {
-//       ...item
-//     }
-//   })
-// })
-console.log(storeToRefs(chatRoom))
 </script>
 
 <style lang="scss" scoped>
