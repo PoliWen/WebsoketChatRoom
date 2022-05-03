@@ -18,56 +18,76 @@
     </div>
     <div class="right-room">
       <h3 class="title">聊天室 ({{ chatRoom.chatData.count }})</h3>
-      <div class="chat-info">
-        <div v-if="chatRoom.chatData.systemMsg.length">
-          <div class="count" v-for="(item, index) in chatRoom.chatData.systemMsg" :key="index">
-            {{ item }}
+      <div class="chat-info" ref="chatRef">
+        <div v-for="(item, index) in chatRoom.chatInfo" :key="index">
+          <div class="count" v-if="item.systemMsg">
+            {{ item.systemMsg }}
           </div>
-        </div>
 
-        <div class="info self-info" v-for="i in 10" :key="i">
-          <div class="avator">
-            <img :src="avator1" alt="" />
+          <div class="info self-info" v-if="item.myMsg">
+            <div class="avator">
+              <img :src="findAvatorSrc(item.myMsg.avator)" alt="" />
+            </div>
+            <div class="message">
+              <span class="poper-arrow"></span>
+              {{ item.myMsg.msg }}
+            </div>
           </div>
-          <div class="message">
-            <span class="poper-arrow"></span>
-            文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼文孝礼
-          </div>
-        </div>
 
-        <div class="info other-info">
-          <div class="avator">
-            <img :src="avator1" alt="" />
-          </div>
-          <div class="message">
-            <span class="poper-arrow"></span>
-            fsdjkfjsfjsflsdjfjslfjsdlfjskjflsdjfsjfljs
+          <div class="info other-info" v-if="item.otherMsg">
+            <div class="avator">
+              <img :src="findAvatorSrc(item.otherMsg.avator)" alt="" />
+            </div>
+            <div class="message">
+              <span class="poper-arrow"></span>
+              {{ item.otherMsg.msg }}
+            </div>
           </div>
         </div>
       </div>
       <div class="send-panel">
-        <textarea name="" id="" cols="30" rows="10"></textarea>
+        <textarea name="" id="" cols="30" rows="10" v-model="content"></textarea>
         <span class="tips">按 ctrl+enter发送</span>
-        <button class="send-btn">发送</button>
+        <button class="send-btn" @click="sendMsg">发送</button>
       </div>
     </div>
   </section>
 </template>
 <script setup lang="ts">
-import { ref, computed, reactive, toRaw, onMounted } from 'vue'
-
-import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
+import socket from '@/utils/socket'
 
 import avatorConfig from '@/dataSurce/avator'
 
 import chatRoomStore from '@/store/chatRoom'
 
-const avator1 = avatorConfig[0].src
-
 const chatRoom = chatRoomStore()
 
 const findAvatorSrc = (avatorName: string) => {
   return avatorConfig.find((item: any) => item.name === avatorName).src
+}
+
+const content = ref('')
+
+// 滚动到最下面
+const chatRef = ref()
+
+const sendMsg = () => {
+  if (!content.value) {
+    alert('请输入内容')
+    return
+  }
+  socket.emit('sendMsg', {
+    msg: content.value,
+    userName: chatRoom.chatData.myself.userName,
+    avator: chatRoom.chatData.myself.avator
+  })
+  content.value = ''
+  console.log(chatRef.value)
+}
+
+document.onkeyup = (e) => {
+  if (e.keyCode === 13) sendMsg()
 }
 </script>
 
@@ -124,6 +144,7 @@ const findAvatorSrc = (avatorName: string) => {
   .chat-info {
     height: 553px;
     overflow-y: auto;
+    padding: 0 10px;
     .count {
       color: #999;
       text-align: center;
@@ -133,7 +154,7 @@ const findAvatorSrc = (avatorName: string) => {
     .info {
       display: flex;
       margin-bottom: 20px;
-      &.other-info {
+      &.self-info {
         justify-content: flex-end;
         .avator {
           order: 2;
@@ -158,7 +179,7 @@ const findAvatorSrc = (avatorName: string) => {
         border: 1px solid #ddd;
         border-radius: 4px;
         padding: 10px;
-        width: 70%;
+        max-width: 70%;
         line-height: 30px;
         position: relative;
       }

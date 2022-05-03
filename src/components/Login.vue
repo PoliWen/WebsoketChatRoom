@@ -25,7 +25,6 @@
 </template>
 <script setup lang="ts">
 import { ref, defineEmits } from 'vue'
-import personStore from '@/store/person'
 
 import avatorConfig from '@/dataSurce/avator'
 

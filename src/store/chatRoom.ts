@@ -5,11 +5,10 @@ export default defineStore('chatRoomStore', {
     return {
       chatData: {
         count: 0,
-        systemMsg: [],
         myself: {},
-        users: [],
-        other: []
-      }
+        users: []
+      },
+      chatInfo: []
     }
   }
 })

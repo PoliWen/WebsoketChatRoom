@@ -5,7 +5,7 @@
 </template>
 <script setup lang="ts">
 // import WebsocketDemo from '@/components/WebsocketDemo.vue'
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import login from '@/components/Login.vue'
 import chatRoomCon from '@/components/ChatRoom.vue'
 import socket from '@/utils/socket'
@@ -35,9 +35,7 @@ socket.on('loginSuccess', (myself: any) => {
 
 // 保存聊天信息
 socket.on('addUser', (msg: string) => {
-  console.log(msg)
-  chatRoom.chatData.systemMsg.push(msg)
-  console.log(chatRoom.chatData.systemMsg)
+  chatRoom.chatInfo.push({ systemMsg: msg })
 })
 
 // 保存聊天信息
@@ -45,6 +43,25 @@ socket.on('userList', (users: any) => {
   chatRoom.chatData.users = users
   chatRoom.chatData.count = users.length
   console.log(chatRoom.chatData.users)
+})
+
+// 退出聊天室
+socket.on('delUser', (user: any) => {
+  chatRoom.chatInfo.push({ systemMsg: `${user.userName}离开了聊天室` })
+})
+
+// 退出聊天室
+
+socket.on('recieveMsg', (data: any) => {
+  const { myself } = chatRoom.chatData
+  console.log('myself', myself)
+  console.log(data)
+  if (myself.userName === data.userName) {
+    chatRoom.chatInfo.push({ myMsg: data })
+  } else {
+    chatRoom.chatInfo.push({ otherMsg: data })
+  }
+  console.log(chatRoom.chatInfo)
 })
 </script>
 <style>
