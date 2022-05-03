@@ -24,84 +24,41 @@
   </section>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import avator1 from '@/assets/images/tx01.jpg'
-import avator2 from '@/assets/images/tx02.jpg'
-import avator3 from '@/assets/images/tx03.jpg'
-import avator4 from '@/assets/images/tx04.jpg'
-import avator5 from '@/assets/images/tx05.jpg'
-import avator6 from '@/assets/images/tx06.jpg'
-import avator7 from '@/assets/images/tx07.jpg'
+import { ref, defineEmits } from 'vue'
+import personStore from '@/store/person'
 
-import socket from '@/utils/socket'
-
-const avatorConfig = [
-  {
-    name: 'avator1',
-    src: avator1
-  },
-  {
-    name: 'avator2',
-    src: avator2
-  },
-  {
-    name: 'avator3',
-    src: avator3
-  },
-  {
-    name: 'avator4',
-    src: avator4
-  },
-  {
-    name: 'avator5',
-    src: avator5
-  },
-  {
-    name: 'avator6',
-    src: avator6
-  },
-  {
-    name: 'avator7',
-    src: avator7
-  }
-]
-
-const userName = ref('')
-const avator = ref('')
-const userNameValidate = ref(true)
-const avatorValidate = ref(true)
-const info = ref('')
-
-// 连接服务成功
-socket.on('welcome', (data: string) => {
-  info.value = data
-})
+import avatorConfig from '@/dataSurce/avator'
 
 // 向服务器发送消息
+const userName = ref('') // 用户名
+const avator = ref('') // 头像
+const userNameValidate = ref(true)
+const avatorValidate = ref(true)
+const emit = defineEmits(['submit'])
 const submit = () => {
   if (!userName.value) {
     userNameValidate.value = false
     return
   }
   userNameValidate.value = true
+
   if (!avator.value) {
     avatorValidate.value = false
     return
   }
   avatorValidate.value = true
-  socket.emit('send', userName.value)
+
+  emit('submit', {
+    userName: userName.value,
+    avator: avator.value
+  })
+  console.log('login', {
+    userName: userName.value,
+    avator: avator.value
+  })
+
   userName.value = ''
 }
-// 接受服务器返回的数据
-interface MsgItem {
-  type: 0 | 1 | 2
-  msg: string
-  time: string
-}
-const message = ref<MsgItem[]>([])
-socket.on('message', (e: any) => {
-  message.value.push(e)
-})
 
 document.onkeyup = (e) => {
   if (e.keyCode === 13) submit()

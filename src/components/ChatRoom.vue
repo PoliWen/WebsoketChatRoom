@@ -1,12 +1,11 @@
-/* eslint-disable import/no-unresolved */
 <template>
   <section class="chat-room">
     <div class="sider-bar">
       <div class="user-info">
         <div class="avator">
-          <img :src="avator1" alt="" />
+          <img :src="myselfAvator" alt="" />
         </div>
-        <span>文孝礼</span>
+        <span>{{ chatRoom.chatData.myself.userName }}</span>
       </div>
       <h3>用户列表</h3>
 
@@ -18,9 +17,14 @@
       </div>
     </div>
     <div class="right-room">
-      <h3 class="title">聊天室 ({{ count }})</h3>
+      <h3 class="title">聊天室 ({{ chatRoom.chatData.count }})</h3>
       <div class="chat-info">
-        <div class="count">111加入了群聊</div>
+        <div v-if="chatRoom.chatData.systemMsg.length">
+          <div class="count" v-for="(item, index) in chatRoom.chatData.systemMsg" :key="index">
+            {{ item }}
+          </div>
+        </div>
+
         <div class="info self-info" v-for="i in 10" :key="i">
           <div class="avator">
             <img :src="avator1" alt="" />
@@ -40,6 +44,7 @@
             fsdjkfjsfjsflsdjfjslfjsdlfjskjflsdjfsjfljs
           </div>
         </div>
+        {{ chatRoom.chatData.users }}
       </div>
       <div class="send-panel">
         <textarea name="" id="" cols="30" rows="10"></textarea>
@@ -50,11 +55,32 @@
   </section>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import socket from '@/utils/socket'
-import avator1 from '@/assets/images/tx01.jpg'
+import { ref, computed, reactive, toRaw, onMounted } from 'vue'
 
-const count = ref('100')
+import { storeToRefs } from 'pinia'
+
+import avatorConfig from '@/dataSurce/avator'
+
+import chatRoomStore from '@/store/chatRoom'
+
+const avator1 = avatorConfig[0].src
+
+const chatRoom = chatRoomStore()
+
+const findAvatorSrc = (avatorName: string) => {
+  return avatorConfig.find((item: any) => item.name === avatorName).src
+}
+const myselfAvator = findAvatorSrc(chatRoom.chatData.myself.avator)
+
+// const userList = computed(() => {
+//   return chatRoom.users.map((item: any) => {
+//     item.avator = findAvatorSrc(item.avator)
+//     return {
+//       ...item
+//     }
+//   })
+// })
+console.log(storeToRefs(chatRoom))
 </script>
 
 <style lang="scss" scoped>
