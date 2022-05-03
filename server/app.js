@@ -19,13 +19,11 @@ const socket = require('socket.io')(server, {
 const users = [] // 记录已经登录的数据
 
 socket.on('connection', (conn) => {
-  console.log('新用户连接了')
   conn.emit('welcome', '服务器连接成功')
 
   // 用户登录
   conn.on('login', (data) => {
     const user = users.find((item) => item.userName === data.userName)
-    console.log(data)
 
     if (user) {
       conn.emit('loginError', { msg: '用户名已存在' })
@@ -58,7 +56,6 @@ socket.on('connection', (conn) => {
 
   // 监听聊天消息
   conn.on('sendMsg', (data) => {
-    console.log(data)
     socket.emit('recieveMsg', data)
   })
 })

@@ -1,7 +1,7 @@
 <template>
   <!-- <WebsocketDemo /> -->
   <login v-if="!isLogin" @submit="joinChat" />
-  <chatRoomCon v-else />
+  <chatRoomCon v-else ref="chatRoomRef" />
 </template>
 <script setup lang="ts">
 // import WebsocketDemo from '@/components/WebsocketDemo.vue'
@@ -12,6 +12,7 @@ import socket from '@/utils/socket'
 import chatRoomStore from '@/store/chatRoom'
 
 const chatRoom = chatRoomStore()
+const chatRoomRef = ref()
 
 const isLogin = ref(false)
 const joinChat = (user: any) => {
@@ -26,8 +27,6 @@ socket.on('loginError', (data: any) => {
 })
 
 socket.on('loginSuccess', (myself: any) => {
-  console.log(myself)
-
   isLogin.value = true
   chatRoom.chatData.myself = myself
   alert('登录成功')
@@ -36,32 +35,30 @@ socket.on('loginSuccess', (myself: any) => {
 // 保存聊天信息
 socket.on('addUser', (msg: string) => {
   chatRoom.chatInfo.push({ systemMsg: msg })
+  chatRoomRef.value.scrollToBootm()
 })
 
 // 保存聊天信息
 socket.on('userList', (users: any) => {
   chatRoom.chatData.users = users
   chatRoom.chatData.count = users.length
-  console.log(chatRoom.chatData.users)
 })
 
 // 退出聊天室
 socket.on('delUser', (user: any) => {
   chatRoom.chatInfo.push({ systemMsg: `${user.userName}离开了聊天室` })
+  chatRoomRef.value.scrollToBootm()
 })
 
-// 退出聊天室
-
+// 发送消息
 socket.on('recieveMsg', (data: any) => {
   const { myself } = chatRoom.chatData
-  console.log('myself', myself)
-  console.log(data)
   if (myself.userName === data.userName) {
     chatRoom.chatInfo.push({ myMsg: data })
   } else {
     chatRoom.chatInfo.push({ otherMsg: data })
   }
-  console.log(chatRoom.chatInfo)
+  chatRoomRef.value.scrollToBootm()
 })
 </script>
 <style>

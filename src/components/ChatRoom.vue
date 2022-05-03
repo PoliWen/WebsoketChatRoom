@@ -30,7 +30,10 @@
             </div>
             <div class="message">
               <span class="poper-arrow"></span>
-              {{ item.myMsg.msg }}
+              <div class="msg" v-if="item.myMsg.msg">{{ item.myMsg.msg }}</div>
+              <div class="imageMsg" v-if="item.myMsg.img">
+                <img :src="item.myMsg.img" alt="" />
+              </div>
             </div>
           </div>
 
@@ -40,12 +43,20 @@
             </div>
             <div class="message">
               <span class="poper-arrow"></span>
-              {{ item.otherMsg.msg }}
+              <div class="msg" v-if="item.otherMsg.msg">{{ item.otherMsg.msg }}</div>
+              <div class="imageMsg" v-if="item.otherMsg.img">
+                <img :src="item.otherMsg.img" alt="" />
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="send-panel">
+        <div class="tool-bar">
+          <span class="pic">
+            <input type="file" @change="sendImg" ref="fileRef" />
+          </span>
+        </div>
         <textarea name="" id="" cols="30" rows="10" v-model="content"></textarea>
         <span class="tips">按 ctrl+enter发送</span>
         <button class="send-btn" @click="sendMsg">发送</button>
@@ -54,12 +65,13 @@
   </section>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, expose } from 'vue'
 import socket from '@/utils/socket'
 
 import avatorConfig from '@/dataSurce/avator'
 
 import chatRoomStore from '@/store/chatRoom'
+import avator from '../dataSurce/avator'
 
 const chatRoom = chatRoomStore()
 
@@ -70,7 +82,6 @@ const findAvatorSrc = (avatorName: string) => {
 const content = ref('')
 
 // 滚动到最下面
-const chatRef = ref()
 
 const sendMsg = () => {
   if (!content.value) {
@@ -83,11 +94,35 @@ const sendMsg = () => {
     avator: chatRoom.chatData.myself.avator
   })
   content.value = ''
-  console.log(chatRef.value)
+  scrollToBootm()
 }
+
+// 滚动到底部
+const chatRef = ref()
+const scrollToBootm = () => {
+  setTimeout(() => {
+    console.log('height', chatRef.value.scrollHeight)
+    chatRef.value.scrollTop = chatRef.value.scrollHeight
+  }, 100)
+}
+expose({ scrollToBootm })
 
 document.onkeyup = (e) => {
   if (e.keyCode === 13) sendMsg()
+}
+
+const fileRef = ref()
+const sendImg = () => {
+  const file = fileRef.value.files[0]
+  const fr = new FileReader()
+  fr.readAsDataURL(file)
+  fr.onload = () => {
+    socket.emit('sendMsg', {
+      userName: chatRoom.chatData.myself.userName,
+      avator: chatRoom.chatData.myself.avator,
+      img: fr.result
+    })
+  }
 }
 </script>
 
@@ -182,6 +217,9 @@ document.onkeyup = (e) => {
         max-width: 70%;
         line-height: 30px;
         position: relative;
+        img {
+          width: 100%;
+        }
       }
       .poper-arrow {
         position: absolute;
@@ -215,11 +253,10 @@ document.onkeyup = (e) => {
   }
   .send-panel {
     border-top: 1px solid #ddd;
-    height: 235px;
+    height: 238px;
     position: relative;
     textarea {
       width: 98%;
-      height: 98%;
       border: none;
       padding: 10px;
     }
@@ -249,6 +286,28 @@ document.onkeyup = (e) => {
     cursor: pointer;
     &:hover {
       opacity: 0.8;
+    }
+  }
+}
+
+.tool-bar {
+  height: 40px;
+  line-height: 40px;
+  padding: 5px 10px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  .pic {
+    width: 30px;
+    height: 30px;
+    display: block;
+    background: url('@/assets/images/send-pic.png');
+    background-size: cover;
+    cursor: pointer;
+    input {
+      width: 30px;
+      height: 30px;
+      opacity: 0;
+      cursor: pointer;
     }
   }
 }
